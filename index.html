@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulario de Endoso — Corredora Ana Carolina Bizama</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --azul: #1a3a5c;
+    --azul-mid: #1e5799;
+    --azul-claro: #e8f0f8;
+    --oro: #c9a84c;
+    --oro-claro: #f5ecd5;
+    --texto: #1c2535;
+    --texto-mid: #4a5568;
+    --texto-suave: #8a96a8;
+    --borde: #d1dce8;
+    --fondo: #f4f7fb;
+    --blanco: #ffffff;
+    --radio: 10px;
+    --sombra: 0 4px 24px rgba(26,58,92,0.10);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* ---- HEADER ---- */
+  .header {
+    background: var(--azul);
+    border-radius: 16px 16px 0 0;
+    padding: 2rem 2.5rem 1.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.10);
+  }
+  .header-izq h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .header-izq .datos-corredora {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .header-izq .datos-corredora span {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.72);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+  }
+  .header-izq .datos-corredora span strong {
+    color: rgba(255,255,255,0.92);
+    font-weight: 500;
+  }
+  .header-der {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .header-der label {
+    display: block;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .correlativo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .correlativo-prefix {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--oro);
+    font-weight: 600;
+  }
+  #correlativo-num {
+    width: 60px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--oro);
+    font-weight: 600;
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid rgba(201,168,76,0.5);
+    text-align: center;
+    outline: none;
+    padding: 0 2px;
+  }
+  #correlativo-num:focus { border-bottom-color: var(--oro); }
+
+  /* ---- DIVIDER ---- */
+  .sub-header {
+    background: var(--azul-mid);
+    padding: 0.7rem 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sub-header svg { opacity: 0.7; }
+  .sub-header span {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+  }
+
+  /* ---- CARD ---- */
+  .card {
+    background: var(--blanco);
+    padding: 2rem 2.5rem;
+    border: 1px solid var(--borde);
+    border-top: none;
+  }
+  .card:last-of-type {
+    border-radius: 0 0 16px 16px;
+  }
+
+  /* ---- SECCIONES ---- */
+  .seccion-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.2rem;
+  }
+  .seccion-titulo .linea {
+    flex: 1;
+    height: 1px;
+    background: var(--borde);
+  }
+  .seccion-titulo span {
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--azul);
+    white-space: nowrap;
+  }
+  .seccion-titulo .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--oro);
+    flex-shrink: 0;
+  }
+
+  /* ---- GRID ---- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .grid-1 { display: grid; grid-template-columns: 1fr; gap: 1.2rem; }
+
+  /* ---- CAMPOS ---- */
+  .campo { display: flex; flex-direction: column; gap: 6px; }
+  .campo label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--texto-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .campo label .req { color: var(--oro); margin-left: 2px; }
+
+  .campo input,
+  .campo select,
+  .campo textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--texto);
+    background: var(--fondo);
+    border: 1.5px solid var(--borde);
+    border-radius: var(--radio);
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+  }
+  .campo input:focus,
+  .campo select:focus,
+  .campo textarea:focus {
+    border-color: var(--azul-mid);
+    background: #fff;
+  }
+  .campo textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+  .campo select { appearance: none; cursor: pointer; }
+
+  /* ---- SEPARADOR ---- */
+  .separador { height: 1.5rem; }
+
+  /* ---- BOTONES ---- */
+  .acciones {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--borde);
+    margin-top: 1.5rem;
+  }
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: var(--radio);
+    padding: 11px 22px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-secundario {
+    background: var(--fondo);
+    color: var(--texto-mid);
+    border: 1.5px solid var(--borde);
+  }
+  .btn-secundario:hover { background: #e4e9f0; }
+  .btn-primario {
+    background: var(--azul);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(26,58,92,0.22);
+  }
+  .btn-primario:hover { background: var(--azul-mid); transform: translateY(-1px); }
+  .btn-primario:active { transform: translateY(0); }
+  .btn svg { flex-shrink: 0; }
+
+  /* ---- ALERTA ---- */
+  .alerta {
+    display: none;
+    background: #fef3f2;
+    border: 1.5px solid #fca5a5;
+    border-radius: var(--radio);
+    padding: 10px 16px;
+    font-size: 0.88rem;
+    color: #b91c1c;
+    margin-top: 1rem;
+  }
+
+  /* ---- FOOTER ---- */
+  .footer-form {
+    background: var(--azul-claro);
+    border: 1px solid var(--borde);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    padding: 0.9rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-form span {
+    font-size: 0.75rem;
+    color: var(--texto-suave);
+  }
+  .footer-form strong { color: var(--azul); }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 560px) {
+    .header { flex-direction: column; gap: 1rem; }
+    .header-der { text-align: left; }
+    .correlativo-wrap { justify-content: flex-start; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .card { padding: 1.5rem 1.2rem; }
+    .header, .sub-header, .footer-form { padding-left: 1.2rem; padding-right: 1.2rem; }
+  }
+
+  .firma-cursiva {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.5rem;
+    color: #1a3a5c;
+    padding: 4px 0;
+    display: block;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ENCABEZADO -->
+  <div class="header">
+    <div class="header-izq">
+      <h1>Corredora Ana Carolina Bizama</h1>
+      <div class="datos-corredora">
+        <span><strong>RUT:</strong> 9.224.096-7</span>
+        <span><strong>Correo:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="127173607d7e7b7c733c707b68737f7352757f737b7e3c717d7f">[email&#160;protected]</a></span>
+        <span><strong>Cel:</strong> +56 9 9436 5636</span>
+      </div>
+    </div>
+    <div class="header-der">
+      <label>N° Correlativo</label>
+      <div class="correlativo-wrap">
+        <span class="correlativo-prefix">2026 /</span>
+        <input type="number" id="correlativo-num" value="1" min="1" max="9999">
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-header">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span>Solicitud de Endoso de Seguro</span>
+  </div>
+
+  <!-- DATOS DEL ASEGURADO -->
+  <div class="card">
+    <div class="seccion-titulo">
+      <div class="dot"></div>
+      <span>Datos del Asegurado</span>
+      <div class="linea"></div>
+    </div>
+    <div class="grid-2">
+      <div class="campo">
+        <label>Nombre Completo <span class="req">*</span></label>
+        <input type="text" id="nombre" placeholder="Ej: Juan Pérez González">
+      </div>
+      <div class="campo">
+        <label>RUT <span class="req">*</span></label>
+        <input type="text" id="rut" placeholder="Ej: 12.345.678-9">
+      </div>
+    </div>
+
+    <div class="separador"></div>
+
+    <div class="seccion-titulo">
+      <div class="dot"></div>
+      <span>Datos de la Póliza</span>
+      <div class="linea"></div>
+    </div>
+    <div class="grid-2">
+      <div class="campo">
+        <label>Compañía de Seguro <span class="req">*</span></label>
+        <select id="compania">
+          <option value="">Seleccionar compañía...</option>
+          <option>Mapfre Chile</option>
+          <option>Bci Seguros</option>
+          <option>Consorcio</option>
+          <option>Zurich Chile</option>
+          <option>HDI Seguros</option>
+          <option>Renta Nacional</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label>Número de Póliza</label>
+        <input type="text" id="poliza" placeholder="Ej: POL-2024-00123">
+      </div>
+      <div class="campo" style="grid-column: 1 / -1;">
+        <label>Vigencia de la Póliza</label>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <input type="date" id="vigencia-desde" style="flex:1; min-width:140px;">
+          <span style="font-size:13px; color:var(--texto-mid); white-space:nowrap;">al</span>
+          <input type="date" id="vigencia-hasta" style="flex:1; min-width:140px;">
+          <span id="vigencia-display" style="font-size:13px; color:var(--azul); font-weight:500; min-width:200px;"></span>
+        </div>
+      </div>
+      <div class="campo">
+        <label>Materia Asegurada</label>
+        <input type="text" id="materia" placeholder="Ej: Vehículo, Hogar, Vida...">
+      </div>
+      <div class="campo">
+        <label>Fecha de Solicitud <span class="req">*</span></label>
+        <input type="date" id="fecha">
+      </div>
+      <div class="campo">
+        <label>Tipo de Endoso <span class="req">*</span></label>
+        <select id="tipo">
+          <option value="">Seleccionar tipo...</option>
+          <option>Modificación de cobertura</option>
+          <option>Cambio de beneficiario</option>
+          <option>Actualización de datos</option>
+          <option>Inclusión de bien asegurado</option>
+          <option>Exclusión de bien asegurado</option>
+          <option>Cambio de suma asegurada</option>
+          <option>Anulación de póliza</option>
+          <option>Cancelación de póliza</option>
+          <option>Corregir patente</option>
+          <option>Cambiar forma de pago</option>
+          <option>Otro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="separador"></div>
+
+    <div class="seccion-titulo">
+      <div class="dot"></div>
+      <span>Detalle del Endoso</span>
+      <div class="linea"></div>
+    </div>
+    <div class="grid-1">
+      <div class="campo">
+        <label>Descripción del Endoso <span class="req">*</span></label>
+        <textarea id="descripcion" placeholder="Describa detalladamente los cambios o modificaciones solicitadas al contrato de seguro..."></textarea>
+      </div>
+      <div class="campo">
+        <label>Observaciones Adicionales</label>
+        <textarea id="observaciones" placeholder="Información adicional relevante (opcional)..." style="min-height:80px;"></textarea>
+      </div>
+    </div>
+
+    <div id="alerta" class="alerta"></div>
+
+    <div class="acciones">
+      <button class="btn btn-secundario" onclick="limpiarForm()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+        Limpiar
+      </button>
+      <button class="btn btn-primario" onclick="generarPDF()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="footer-form">
+    <span>Los datos se procesan <strong>localmente</strong> en tu navegador.</span>
+    <span id="fecha-hoy-display"></span>
+  </div>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const FIRMA_B64 = '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';
+
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+function fechaLarga(str) {
+  const d = new Date(str + 'T12:00:00');
+  return d.getDate() + ' de ' + MESES[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+function hoyLarga() {
+  const d = new Date();
+  return d.getDate() + ' de ' + MESES[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+const MESES_CORTOS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function formatFechaCorta(str) {
+  if (!str) return '';
+  const d = new Date(str + 'T12:00:00');
+  return String(d.getDate()).padStart(2,'0') + ' ' + MESES_CORTOS[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function formatRut(v) {
+  v = v.replace(/[^0-9kK]/g,'');
+  if (v.length < 2) return v;
+  const dv = v.slice(-1);
+  let num = v.slice(0,-1).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  return num + '-' + dv.toUpperCase();
+}
+
+document.getElementById('rut').addEventListener('input', function(){ this.value = formatRut(this.value); });
+
+function actualizarVigencia() {
+  const d = document.getElementById('vigencia-desde').value;
+  const h = document.getElementById('vigencia-hasta').value;
+  const el = document.getElementById('vigencia-display');
+  if (d && h) {
+    el.textContent = formatFechaCorta(d) + ' al ' + formatFechaCorta(h);
+  } else {
+    el.textContent = '';
+  }
+}
+document.getElementById('vigencia-desde').addEventListener('change', actualizarVigencia);
+document.getElementById('vigencia-hasta').addEventListener('change', actualizarVigencia);
+document.getElementById('fecha').valueAsDate = new Date();
+document.getElementById('fecha-hoy-display').textContent = hoyLarga();
+
+function limpiarForm() {
+  ['nombre','rut','compania','poliza','fecha','tipo','descripcion','observaciones','vigencia-desde','vigencia-hasta','materia'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('vigencia-display').textContent = '';
+  document.getElementById('fecha').valueAsDate = new Date();
+  document.getElementById('alerta').style.display = 'none';
+}
+
+function mostrarAlerta(msg) {
+  const el = document.getElementById('alerta');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+function generarPDF() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const rut = document.getElementById('rut').value.trim();
+  const compania = document.getElementById('compania').value;
+  const poliza = document.getElementById('poliza').value.trim();
+  const fecha = document.getElementById('fecha').value;
+  const tipo = document.getElementById('tipo').value;
+  const descripcion = document.getElementById('descripcion').value.trim();
+  const observaciones = document.getElementById('observaciones').value.trim();
+  const vDesde = document.getElementById('vigencia-desde').value;
+  const vHasta = document.getElementById('vigencia-hasta').value;
+  const vigencia = (vDesde && vHasta) ? (formatFechaCorta(vDesde) + ' al ' + formatFechaCorta(vHasta)) : '';
+  const materia = document.getElementById('materia').value.trim();
+  const corrNum = document.getElementById('correlativo-num').value || '1';
+  const correlativo = '2026/' + corrNum;
+
+  if (!nombre || !rut || !compania || !fecha || !tipo || !descripcion) {
+    mostrarAlerta('⚠ Complete todos los campos obligatorios antes de generar el PDF.');
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210, M = 20, CW = W - M * 2;
+
+  // Encabezado azul
+  doc.setFillColor(26, 58, 92);
+  doc.rect(0, 0, W, 54, 'F');
+
+  // Franja dorada decorativa
+  doc.setFillColor(201, 168, 76);
+  doc.rect(0, 54, W, 2, 'F');
+
+  // Nombre corredora
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Corredora Ana Carolina Bizama', M, 16);
+
+  // Datos contacto
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(200, 215, 235);
+  doc.text('RUT: 9.224.096-7', M, 24);
+  doc.text('carolina.bizama@gmail.com   |   +56 9 9436 5636', M, 30);
+
+  // Correlativo (derecha)
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(201, 168, 76);
+  doc.text('N\u00b0 ' + correlativo, W - M, 16, { align: 'right' });
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(180, 200, 225);
+  doc.text('CORRELATIVO', W - M, 22, { align: 'right' });
+
+  // Separador interno
+  doc.setDrawColor(255, 255, 255, 0.2);
+  doc.setLineWidth(0.3);
+  doc.line(M, 35, W - M, 35);
+
+  // Título documento
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text('SOLICITUD DE ENDOSO DE SEGURO', W / 2, 44, { align: 'center' });
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(180, 200, 225);
+  doc.text('Emitido el ' + hoyLarga(), W / 2, 51, { align: 'center' });
+
+  let y = 68;
+
+  function seccion(titulo) {
+    doc.setFillColor(232, 240, 248);
+    doc.rect(M, y - 5, CW, 9, 'F');
+    doc.setFillColor(201, 168, 76);
+    doc.rect(M, y - 5, 3, 9, 'F');
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(26, 58, 92);
+    doc.text(titulo.toUpperCase(), M + 7, y + 1);
+    y += 13;
+  }
+
+  function campo(label, value) {
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(120, 130, 145);
+    doc.text(label.toUpperCase() + ':', M + 2, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(28, 37, 53);
+    doc.text(value || '\u2014', M + 55, y);
+    doc.setDrawColor(210, 220, 232);
+    doc.setLineWidth(0.2);
+    doc.line(M, y + 3.5, M + CW, y + 3.5);
+    y += 12;
+  }
+
+  function campoTexto(label, value) {
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(120, 130, 145);
+    doc.text(label.toUpperCase() + ':', M + 2, y);
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(28, 37, 53);
+    const lines = doc.splitTextToSize(value || '\u2014', CW - 4);
+    doc.text(lines, M + 2, y);
+    y += lines.length * 5.5 + 3;
+    doc.setDrawColor(210, 220, 232);
+    doc.setLineWidth(0.2);
+    doc.line(M, y, M + CW, y);
+    y += 7;
+  }
+
+  seccion('Datos del Asegurado');
+  campo('Nombre completo', nombre);
+  campo('RUT', rut);
+  y += 2;
+
+  seccion('Datos de la P\u00f3liza');
+  campo('Compa\u00f1\u00eda de seguro', compania);
+  campo('N\u00famero de p\u00f3liza', poliza || 'No indicado');
+  if (vigencia) campo('Vigencia', vigencia);
+  if (materia) campo('Materia asegurada', materia);
+  campo('Fecha de solicitud', fechaLarga(fecha));
+  campo('Tipo de endoso', tipo);
+  y += 2;
+
+  seccion('Detalle del Endoso');
+  campoTexto('Descripci\u00f3n', descripcion);
+  if (observaciones) campoTexto('Observaciones adicionales', observaciones);
+
+  // Firmas
+  const firmaBaseY = Math.max(y + 8, 218);
+  doc.setDrawColor(26, 58, 92);
+  doc.setLineWidth(0.5);
+  doc.line(M, firmaBaseY + 22, M + 60, firmaBaseY + 22);
+  doc.line(W - M - 60, firmaBaseY + 22, W - M, firmaBaseY + 22);
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 110, 125);
+  doc.text('Firma del Asegurado', M + 30, firmaBaseY + 27, { align: 'center' });
+  doc.text('Firma Corredora', W - M - 30, firmaBaseY + 27, { align: 'center' });
+
+  // Firma en cursiva (texto)
+  doc.setFont('helvetica', 'bolditalic');
+  doc.setFontSize(13);
+  doc.setTextColor(26, 58, 92);
+  doc.text('Ana Carolina Bizama', W - M - 30, firmaBaseY + 14, { align: 'center' });
+
+  // Footer
+  doc.setFillColor(26, 58, 92);
+  doc.rect(0, 280, W, 17, 'F');
+  doc.setFillColor(201, 168, 76);
+  doc.rect(0, 280, W, 1.5, 'F');
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text('Corredora Ana Carolina Bizama  \u2022  RUT 9.224.096-7', W / 2, 287, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(180, 200, 225);
+    doc.text('carolina.bizama@gmail.com  •  +56 9 9436 5636  •  ' + hoyLarga(), W / 2, 293, { align: 'center' });
+
+  const archivo = 'endoso_' + correlativo.replace('/', '-') + '_' + nombre.split(' ')[0].toLowerCase() + '.pdf';
+  
+  // Método robusto de descarga compatible con todos los navegadores
+  const pdfBlob = doc.output('blob');
+  const url = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = archivo;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+</script>
+</body>
+</html>
